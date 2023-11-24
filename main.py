@@ -45,6 +45,7 @@ else:
 
 
 class Sensor:
+    """Represents a soil moisture sensor."""
     def __init__(self, pin):
         self.min_moisture = 65535
         self.max_moisture = 21000
@@ -57,6 +58,7 @@ class Sensor:
 
 
 class ButtonDisplayStateMachine:
+    """Handles the button press and updates the OLED display based on the button state."""
     def __init__(self, button_pin, oled, sensor1, sensor2):
         self.button = Pin(button_pin, Pin.IN)
         self.oled = oled
