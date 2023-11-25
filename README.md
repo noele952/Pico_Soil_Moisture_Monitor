@@ -58,7 +58,7 @@ To use this plant monitoring system, follow these steps:
 4. Configure the necessary parameters in the code, such as Wi-Fi credentials and Blynk authentication token.
 5. Run the main script on your microcontroller.
 
-The soil moisture monitor can be powered by USB, or a 3V battery
+The soil moisture monitor can be powered by the USB port on the pico board, or plug in a 3V(AA x 2) battery. 2 moisture sensors are attached. If a sensor reads low moisture, the LED below the sensor lights up. Pressing the button will dispaly the current moisture percentage for sensor 1, press again to see the value for sensor 2, and a third press clears the screen.
 
 ## Contributing
 
