@@ -9,7 +9,7 @@ Parameters:
     Type: String
     Description: "Enter a name for your IoT Policy"
 
-  SoilMoistureLowAlertaLambdaFunctionName:
+  SoilMoistureLowAlertLambdaFunctionName:
     Type: String
     Description: "Enter a name for your Lambda function"
     Default: "SoilMoistureLowAlertLambdaFunction"
@@ -43,11 +43,19 @@ Resources:
               - "iot:Receive"
             Resource: "*"
 
-  SoilMoistureIoTThingPolicyAttachment:
-    Type: "AWS::IoT::PolicyPrincipalAttachment"
+  DynamoDBTable:
+    Type: "AWS::DynamoDB::Table"
     Properties:
-      PolicyName: !Ref SoilMoistureIoTPolicy
-      Principal: !GetAtt SoilMoistureIoTThing.Arn
+      TableName: "soil_moisture_notification"
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
   SoilMoistureLowAlertaLambdaFunctionRole:
     Type: "AWS::IAM::Role"
@@ -75,7 +83,7 @@ Resources:
                   - "dynamodb:CreateTable"
                   - "dynamodb:GetItem"
                   - "dynamodb:PutItem"
-                Resource: "arn:aws:dynamodb:REGION:ACCOUNT_ID:table/fluid_level_notification"
+                Resource: !GetAtt DynamoDBTable.Arn
               - Effect: "Allow"
                 Action:
                   - "ses:SendEmail"
@@ -93,7 +101,7 @@ Resources:
       MemorySize: 256
       Code:
         S3Bucket: "hydropico-assets"
-        S3Key: "SoilMoistureLowAlertaLambdaFunction.zip"
+        S3Key: "SoilMoistureLowAlertLambdaFunction.zip"
       Environment:
         Variables:
           SENDER_EMAIL: !Ref SoilMoistureSenderEmailSES
