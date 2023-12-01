@@ -6,12 +6,12 @@ import network
 
 
 # Define MQTT parameters
-MQTT_ENDPOINT = 'a1j74h8kgrsvow-ats.iot.us-east-1.amazonaws.com'
-MQTT_CLIENT_ID = 'soil_moisture_machine'
+MQTT_ENDPOINT = 'mqtt_endpoint'
+MQTT_CLIENT_ID = 'mqtt_client_id'
 
 # Set up Wi-Fi credentials
-SSID = "Howard"
-SSID_Password = "Scally12"
+SSID = 'SSID'
+SSID_Password = 'password'
 
 
 # Connect to the network
