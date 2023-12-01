@@ -1,7 +1,0 @@
-# Define MQTT parameters
-MQTT_ENDPOINT = 'a1j74h8kgrsvow-ats.iot.us-east-1.amazonaws.com'
-MQTT_CLIENT_ID = 'soil_moisture_machine'
-
-# Set up Wi-Fi credentials
-SSID = "Howard"
-SSID_Password = "Scally12"
