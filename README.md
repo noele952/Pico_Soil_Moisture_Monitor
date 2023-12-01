@@ -5,6 +5,7 @@ This project is a plant monitoring system that measures soil moisture levels usi
 ## Table of Contents
 
 - [Software Dependencies](#software-dependencies)
+- [Deployment](#deployment)
 - [Hardware Setup](#hardware-setup)
 - [Usage](#usage)
 - [Contributing](#contributing)
@@ -16,9 +17,21 @@ Install the following Micropythonlibraries on the pico w microcontroller
 
 - [SSD1306 Driver GitHub](https://github.com/noele952/micropython-ssd1306-custom-text/blob/main/ssd1306.py)
 
-- [Blynk Library Python](https://github.com/vshymanskyy/blynk-library-python/blob/master/BlynkLib.py)
-
 - [umqtt.simple GitHub](https://github.com/fizista/micropython-umqtt.simple2)
+
+## Deployment
+
+A CloudFormation File is included which will deploy the AWS IoT resources for the Soil Moisture Monitor, including a Lambda function that will send a watering reminder when the moisture level is low. A valid SES email is required for sending.
+
+In order to create a secure connection you will need to manually generate a security certificate and private key in AWS IoT Core, convert them to DER format, and save in the /certs folder on your Pico.
+
+To complete the conversion you will need to have openssl installed
+
+```
+openssl rsa -in private.pem.key -out private.der - outform DER
+
+openssl x509 -in certificate.pem.crt -out certificate.der -outform DER
+```
 
 ## Hardware Setup
 

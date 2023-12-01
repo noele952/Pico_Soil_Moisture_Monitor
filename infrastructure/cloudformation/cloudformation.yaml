@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  SoilMoistureThingName:
+    Type: String
+    Description: "Enter a name for your IoT Thing"
+
+  SoilMoisturePolicyName:
+    Type: String
+    Description: "Enter a name for your IoT Policy"
+
+  SoilMoistureLowAlertaLambdaFunctionName:
+    Type: String
+    Description: "Enter a name for your Lambda function"
+    Default: "SoilMoistureLowAlertLambdaFunction"
+
+  SoilMoistureSenderEmailSES:
+    Type: String
+    Description: "Enter the email that will be used to send alerts"
+
+  SoilMoistureRecipientEmailSES:
+    Type: String
+    Description: "Enter the email that will be receiving alerts"
+
+Resources:
+  SoilMoistureIoTThing:
+    Type: "AWS::IoT::Thing"
+    Properties:
+      ThingName: !Ref SoilMoistureThingName
+
+  SoilMoistureIoTPolicy:
+    Type: "AWS::IoT::Policy"
+    Properties:
+      PolicyName: !Ref SoilMoisturePolicyName
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "iot:Connect"
+              - "iot:Publish"
+              - "iot:Subscribe"
+              - "iot:Receive"
+            Resource: "*"
+
+  SoilMoistureIoTThingPolicyAttachment:
+    Type: "AWS::IoT::PolicyPrincipalAttachment"
+    Properties:
+      PolicyName: !Ref SoilMoistureIoTPolicy
+      Principal: !GetAtt SoilMoistureIoTThing.Arn
+
+  SoilMoistureLowAlertaLambdaFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "SoilMoistureLowAlertLambdaFunctionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: "Allow"
+                Action:
+                  - "dynamodb:CreateTable"
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                Resource: "arn:aws:dynamodb:REGION:ACCOUNT_ID:table/fluid_level_notification"
+              - Effect: "Allow"
+                Action:
+                  - "ses:SendEmail"
+                  - "ses:SendRawEmail"
+                Resource: "*"
+
+  SoilMoistureLowAlertaLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: !Ref SoilMoistureLowAlertLambdaFunctionName
+      Handler: "index.lambda_handler"
+      Role: !GetAtt SoilMoistureLowAlertaLambdaFunctionRole.Arn
+      Runtime: "python3.10"
+      Timeout: 60
+      MemorySize: 256
+      Code:
+        S3Bucket: "hydropico-assets"
+        S3Key: "SoilMoistureLowAlertaLambdaFunction.zip"
+      Environment:
+        Variables:
+          SENDER_EMAIL: !Ref SoilMoistureSenderEmailSES
+          RECIPIENT_EMAIL: !Ref SoilMoistureRecipientEmailSES
